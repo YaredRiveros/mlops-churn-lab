@@ -22,6 +22,7 @@ los detecta. Esta ficha es el registro de esas decisiones: se versiona junto al 
 | Fase | Riesgo | Control (quality gate) | Dónde vive |
 |---|---|---|---|
 | 1. Negocio y datos | El dataset cambia de esquema o trae valores imposibles | Contrato de datos | `src/validate_data.py`, job `data-validation` |
+| 1. Negocio y datos | Mismo cliente cargado dos veces con otro id | Check `no_full_duplicates` + test | `src/validate_data.py`, `tests/test_data_contract.py` |
 | 1. Negocio y datos | `"None"` leído como nulo y luego imputado | `keep_default_na=False` + test | `src/common.py`, `tests/test_data_contract.py` |
 | 2. Preparación | Training-serving skew: la API preprocesa distinto que el entrenamiento | Preprocesamiento dentro del Pipeline | `src/features.py`, `tests/test_features.py` |
 | 2. Preparación | Data leakage: el escalador ve datos de test | El Pipeline se ajusta solo con train, fold por fold | `src/train.py` |
@@ -38,5 +39,10 @@ los detecta. Esta ficha es el registro de esas decisiones: se versiona junto al 
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
-| | Umbral de decisión elegido por costo, no 0.5 | Un FN cuesta el doble que un FP |
-| | El modelo se selecciona por F1 de validación cruzada | Test queda reservado para la evaluación final |
+| 2026-11-11 | Umbral de decisión elegido por costo, no 0.5 (umbral resultante 0.3) | Un FN cuesta el doble que un FP |
+| 2026-11-11 | El modelo se selecciona por F1 de validación cruzada | Test queda reservado para la evaluación final |
+| 2026-11-11 | Preprocesamiento dentro de un `Pipeline` de scikit-learn | Elimina el training-serving skew (la API ignoraba `contract_type`) |
+| 2026-11-11 | Se agrega `gradient_boosting` como cuarto candidato; el elegido sigue siendo `random_forest` | F1 CV 0.6476 ± 0.0761 y ROC-AUC CV 0.6858, por debajo de random_forest (0.6900 / 0.7326) |
+| 2026-11-11 | Se mantienen los costos FN 200 / FP 100 | Con FN 500 / FP 50 el umbral óptimo es 0.05 (contactar a todos) y el modelo no ahorra frente a esa política |
+| 2026-11-11 | `contract_type` no entra al gate de segmentos; se reporta aparte | Brecha de recall 0.50 (> 0.25) por pocos churners en contratos largos; no es un atributo sensible |
+| 2026-11-11 | Contrato de datos con check de filas duplicadas completas | Un cliente duplicado con otro id sesga el entrenamiento y no lo detecta `unique_id` |

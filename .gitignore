@@ -89,3 +89,7 @@ infra/terraform.tfstate.d/
 
 slides_CRISP_DM_Churn.html
 docs/slides_MLOps_Churn.html
+data/train.csv
+data/test.csv
+reports/data_validation.json
+reports/evaluation_report.json
