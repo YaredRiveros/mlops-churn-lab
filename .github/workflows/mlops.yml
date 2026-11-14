@@ -348,7 +348,9 @@ jobs:
         run: |
           RUN_ID=$(gh run list --workflow mlops.yml --branch develop --commit ${{ needs.build-and-publish.outputs.source_sha }}             --status success --limit 1 --json databaseId --jq '.[0].databaseId')
           echo "Artefactos de la corrida de develop $RUN_ID"
-          gh run download "$RUN_ID" --name production-artifacts --dir .
+          # gh no sobrescribe archivos del checkout: se descarga aparte y se copia encima
+          gh run download "$RUN_ID" --name production-artifacts --dir "$RUNNER_TEMP/develop-model"
+          cp -r "$RUNNER_TEMP/develop-model/." .
       - name: Test de training-serving skew contra producción
         run: API_URL=${{ steps.deploy.outputs.url }} pytest tests/test_skew.py -v
       - name: Resumen
