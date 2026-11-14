@@ -21,3 +21,11 @@ data/batch_*
 data/churn_predictions*
 data/feature_correlation*
 data/model_comparison*
+data/train.csv
+data/test.csv
+data/best_model.pkl
+logs/
+monitoring/
+scripts/
+configs/
+src/

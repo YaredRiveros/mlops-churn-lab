@@ -1,0 +1,528 @@
+{
+  "source": "scenario:competitor",
+  "model_version": "1",
+  "reference_f1": 0.7013,
+  "thresholds": {
+    "psi_warning": 0.1,
+    "psi_critical": 0.25,
+    "ks_alpha": 0.05,
+    "max_f1_drop": 0.1,
+    "min_drifted_features": 2
+  },
+  "decision": "REENTRENAR",
+  "reasons": [
+    "F1 cay\u00f3 0.32"
+  ],
+  "windows": [
+    {
+      "window": "week_1",
+      "intensity": 0.0,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0422,
+          "test": "ks",
+          "p_value": 0.3078,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0127,
+          "test": "ks",
+          "p_value": 0.7484,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0073,
+          "test": "ks",
+          "p_value": 0.9999,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0,
+          "test": "chi2",
+          "p_value": 1.0,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.0218,
+          "test": "chi2",
+          "p_value": 0.2346,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0004,
+          "test": "chi2",
+          "p_value": 0.971,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0002,
+          "test": "chi2",
+          "p_value": 0.9687,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.0422,
+      "prediction_drift": {
+        "psi": 0.0109,
+        "predicted_churn_rate": 0.7433
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.7013,
+        "recall": 0.9,
+        "f1_drop": 0.0
+      },
+      "decision": "MONITOREAR",
+      "reasons": []
+    },
+    {
+      "window": "week_2",
+      "intensity": 0.0,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0238,
+          "test": "ks",
+          "p_value": 0.9206,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0387,
+          "test": "ks",
+          "p_value": 0.381,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0056,
+          "test": "ks",
+          "p_value": 0.9998,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0025,
+          "test": "chi2",
+          "p_value": 0.6233,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.0017,
+          "test": "chi2",
+          "p_value": 0.8902,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0004,
+          "test": "chi2",
+          "p_value": 0.971,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0011,
+          "test": "chi2",
+          "p_value": 0.7989,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.0387,
+      "prediction_drift": {
+        "psi": 0.0117,
+        "predicted_churn_rate": 0.76
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.7013,
+        "recall": 0.9,
+        "f1_drop": 0.0
+      },
+      "decision": "MONITOREAR",
+      "reasons": []
+    },
+    {
+      "window": "week_3",
+      "intensity": 0.0,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0221,
+          "test": "ks",
+          "p_value": 0.6035,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0239,
+          "test": "ks",
+          "p_value": 0.4788,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0101,
+          "test": "ks",
+          "p_value": 0.9974,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0049,
+          "test": "chi2",
+          "p_value": 0.4704,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.0052,
+          "test": "chi2",
+          "p_value": 0.7076,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0016,
+          "test": "chi2",
+          "p_value": 0.8983,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0,
+          "test": "chi2",
+          "p_value": 1.0,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.0239,
+      "prediction_drift": {
+        "psi": 0.0159,
+        "predicted_churn_rate": 0.7933
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.7013,
+        "recall": 0.9,
+        "f1_drop": 0.0
+      },
+      "decision": "MONITOREAR",
+      "reasons": []
+    },
+    {
+      "window": "week_4",
+      "intensity": 0.0,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0094,
+          "test": "ks",
+          "p_value": 1.0,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0567,
+          "test": "ks",
+          "p_value": 0.4788,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0107,
+          "test": "ks",
+          "p_value": 0.7007,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0,
+          "test": "chi2",
+          "p_value": 1.0,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.0233,
+          "test": "chi2",
+          "p_value": 0.213,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0031,
+          "test": "chi2",
+          "p_value": 0.8102,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0011,
+          "test": "chi2",
+          "p_value": 0.7989,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.0567,
+      "prediction_drift": {
+        "psi": 0.0249,
+        "predicted_churn_rate": 0.7333
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.7013,
+        "recall": 0.9,
+        "f1_drop": 0.0
+      },
+      "decision": "MONITOREAR",
+      "reasons": []
+    },
+    {
+      "window": "week_5",
+      "intensity": 0.25,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0397,
+          "test": "ks",
+          "p_value": 0.3555,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0186,
+          "test": "ks",
+          "p_value": 0.7167,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0166,
+          "test": "ks",
+          "p_value": 0.9819,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0001,
+          "test": "chi2",
+          "p_value": 0.977,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.0074,
+          "test": "chi2",
+          "p_value": 0.6109,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0071,
+          "test": "chi2",
+          "p_value": 0.6243,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0,
+          "test": "chi2",
+          "p_value": 1.0,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.0397,
+      "prediction_drift": {
+        "psi": 0.0176,
+        "predicted_churn_rate": 0.7833
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.7317,
+        "recall": 0.8571,
+        "f1_drop": -0.0304
+      },
+      "decision": "MONITOREAR",
+      "reasons": []
+    },
+    {
+      "window": "week_6",
+      "intensity": 0.5,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.019,
+          "test": "ks",
+          "p_value": 0.9104,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0129,
+          "test": "ks",
+          "p_value": 0.8996,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0186,
+          "test": "ks",
+          "p_value": 0.9974,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0081,
+          "test": "chi2",
+          "p_value": 0.3405,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.006,
+          "test": "chi2",
+          "p_value": 0.6714,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0108,
+          "test": "chi2",
+          "p_value": 0.4878,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0044,
+          "test": "chi2",
+          "p_value": 0.5158,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.019,
+      "prediction_drift": {
+        "psi": 0.0203,
+        "predicted_churn_rate": 0.7867
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.507,
+        "recall": 0.75,
+        "f1_drop": 0.1943
+      },
+      "decision": "REENTRENAR",
+      "reasons": [
+        "F1 cay\u00f3 0.19"
+      ]
+    },
+    {
+      "window": "week_7",
+      "intensity": 0.75,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0408,
+          "test": "ks",
+          "p_value": 0.4788,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0126,
+          "test": "ks",
+          "p_value": 0.7326,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0182,
+          "test": "ks",
+          "p_value": 0.8882,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0003,
+          "test": "chi2",
+          "p_value": 0.9157,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.0092,
+          "test": "chi2",
+          "p_value": 0.5388,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0023,
+          "test": "chi2",
+          "p_value": 0.8568,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0002,
+          "test": "chi2",
+          "p_value": 0.9682,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.0408,
+      "prediction_drift": {
+        "psi": 0.0162,
+        "predicted_churn_rate": 0.8133
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.4932,
+        "recall": 0.6923,
+        "f1_drop": 0.2081
+      },
+      "decision": "REENTRENAR",
+      "reasons": [
+        "F1 cay\u00f3 0.21"
+      ]
+    },
+    {
+      "window": "week_8",
+      "intensity": 1.0,
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0137,
+          "test": "ks",
+          "p_value": 0.9974,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.0552,
+          "test": "ks",
+          "p_value": 0.1244,
+          "status": "ok"
+        },
+        "support_tickets_last_6m": {
+          "psi": 0.0226,
+          "test": "ks",
+          "p_value": 0.6683,
+          "status": "ok"
+        },
+        "gender": {
+          "psi": 0.0049,
+          "test": "chi2",
+          "p_value": 0.4704,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.012,
+          "test": "chi2",
+          "p_value": 0.4518,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0059,
+          "test": "chi2",
+          "p_value": 0.6756,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0044,
+          "test": "chi2",
+          "p_value": 0.5158,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [],
+      "psi_max": 0.0552,
+      "prediction_drift": {
+        "psi": 0.0278,
+        "predicted_churn_rate": 0.7367
+      },
+      "performance": {
+        "n_labeled": 60,
+        "f1": 0.3836,
+        "recall": 0.5385,
+        "f1_drop": 0.3177
+      },
+      "decision": "REENTRENAR",
+      "reasons": [
+        "F1 cay\u00f3 0.32"
+      ]
+    }
+  ]
+}

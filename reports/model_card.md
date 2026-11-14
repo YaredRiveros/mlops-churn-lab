@@ -1,4 +1,4 @@
-# Model card · churn-predictor v8
+# Model card · churn-predictor v1
 
 ## Uso previsto
 Priorizar clientes para la campaña de retención. La salida es una probabilidad de
@@ -11,7 +11,7 @@ Features: tenure_months, monthly_charges, support_tickets_last_6m, gender, contr
 
 ## Modelo
 Tipo: random_forest dentro de un Pipeline de scikit-learn (preprocesamiento incluido).
-Run de MLflow: `f8869d9c39e1421093e2866ac6de6609`.
+Run de MLflow: `a4c9af738d11415f85def92910bf2075`.
 
 ## Métricas en test (umbral 0.3)
 | F1 | Precision | Recall | ROC-AUC | Costo por cliente |

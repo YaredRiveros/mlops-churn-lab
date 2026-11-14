@@ -1,0 +1,82 @@
+{
+  "source": "logs/predictions.jsonl",
+  "model_version": "1",
+  "reference_f1": 0.7013,
+  "thresholds": {
+    "psi_warning": 0.1,
+    "psi_critical": 0.25,
+    "ks_alpha": 0.05,
+    "max_f1_drop": 0.1,
+    "min_drifted_features": 2
+  },
+  "decision": "REENTRENAR",
+  "reasons": [
+    "data drift en ['monthly_charges', 'support_tickets_last_6m']",
+    "prediction drift (PSI 0.28)"
+  ],
+  "windows": [
+    {
+      "window": "api_log",
+      "n": 300,
+      "data_drift": {
+        "tenure_months": {
+          "psi": 0.0408,
+          "test": "ks",
+          "p_value": 0.4788,
+          "status": "ok"
+        },
+        "monthly_charges": {
+          "psi": 0.4845,
+          "test": "ks",
+          "p_value": 0.0,
+          "status": "critical"
+        },
+        "support_tickets_last_6m": {
+          "psi": 2.7099,
+          "test": "ks",
+          "p_value": 0.0,
+          "status": "critical"
+        },
+        "gender": {
+          "psi": 0.0003,
+          "test": "chi2",
+          "p_value": 0.9157,
+          "status": "ok"
+        },
+        "contract_type": {
+          "psi": 0.0092,
+          "test": "chi2",
+          "p_value": 0.5388,
+          "status": "ok"
+        },
+        "internet_service": {
+          "psi": 0.0023,
+          "test": "chi2",
+          "p_value": 0.8568,
+          "status": "ok"
+        },
+        "senior_citizen": {
+          "psi": 0.0002,
+          "test": "chi2",
+          "p_value": 0.9682,
+          "status": "ok"
+        }
+      },
+      "drifted_features": [
+        "monthly_charges",
+        "support_tickets_last_6m"
+      ],
+      "psi_max": 2.7099,
+      "prediction_drift": {
+        "psi": 0.2784,
+        "predicted_churn_rate": 0.9067
+      },
+      "performance": null,
+      "decision": "REENTRENAR",
+      "reasons": [
+        "data drift en ['monthly_charges', 'support_tickets_last_6m']",
+        "prediction drift (PSI 0.28)"
+      ]
+    }
+  ]
+}
