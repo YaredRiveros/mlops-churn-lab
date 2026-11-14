@@ -1,4 +1,4 @@
-# Model card · churn-predictor v1
+# Model card · churn-predictor v2
 
 ## Uso previsto
 Priorizar clientes para la campaña de retención. La salida es una probabilidad de
