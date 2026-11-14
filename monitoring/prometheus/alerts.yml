@@ -8,3 +8,12 @@ groups:
           severity: critical
         annotations:
           summary: "El monitor decidió REENTRENAR el modelo de churn"
+
+      # Reto 3: data drift crítico sostenido en alguna feature
+      - alert: ChurnModelPsiCritical
+        expr: model_psi_max > 0.25
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PSI máximo {{ $value }} > 0.25 durante 1 minuto (data drift crítico)"
