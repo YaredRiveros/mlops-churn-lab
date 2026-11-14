@@ -30,10 +30,24 @@ los detecta. Esta ficha es el registro de esas decisiones: se versiona junto al 
 | 3. Modelado | Un modelo que no aporta sobre lo trivial | Baseline registrado en MLflow | `src/train.py` |
 | 4. Evaluación | Buena métrica promedio, mala en un segmento | Recall por segmento, brecha máxima | `src/evaluate_and_register.py` |
 | 4. Evaluación | Promover un modelo peor que el vigente | Champion / challenger | `src/evaluate_and_register.py` |
-| 5. Despliegue | La API sirve algo distinto a lo evaluado | Test de skew contra la API en ejecución | `tests/test_skew.py`, job `smoke-test` |
-| 5. Despliegue | Entradas inválidas llegan al modelo | Contrato en el esquema de la API (422) | `app/main.py` |
-| 6. Monitoreo | Los datos de producción cambian | PSI + KS por feature, PSI de predicciones | `src/monitor.py` |
-| 6. Monitoreo | El modelo se degrada sin que cambien los datos | F1 con etiquetas tardías | `src/monitor.py`, `model-monitoring.yml` |
+| 5. Despliegue | La API sirve algo distinto a lo evaluado | ✅ Test de skew contra la API en ejecución (local, contenedor, staging y prod) | `tests/test_skew.py`, jobs `smoke-test`, `deploy-staging`, `deploy-production` |
+| 5. Despliegue | Entradas inválidas llegan al modelo | ✅ Contrato en el esquema de la API (422) | `app/main.py`, `tests/test_api.py` |
+| 5. Despliegue | La imagen nueva no arranca en el entorno | ✅ Health check antes de publicar + circuit breaker de ECS con rollback | job `build-and-publish`, `infra/ecs.tf`, `scripts/deploy_ecs.sh` |
+| 5. Despliegue | Un cambio llega a clientes sin probarse | ✅ Staging desde `develop`, producción desde `main` con aprobación manual | `.github/workflows/mlops.yml`, Environment `production` |
+| 5. Despliegue | Producción corre una imagen distinta a la probada | ✅ Promoción de la misma imagen de staging (sin rebuild en `main`) | job `build-and-publish` (reto 8) |
+| 6. Monitoreo | Los datos de producción cambian | ✅ PSI + KS por feature, PSI de predicciones; alerta `ChurnModelPsiCritical` | `src/monitor.py`, `monitoring/prometheus/alerts.yml` |
+| 6. Monitoreo | El modelo se degrada sin que cambien los datos | ✅ F1 con etiquetas tardías | `src/monitor.py`, `model-monitoring.yml` |
+| 6. Monitoreo | Nadie actúa cuando el monitor decide reentrenar | ✅ Exit 42 dispara `mlops.yml` (Continuous Training) y abre un issue | `model-monitoring.yml` |
+| 6. Monitoreo | Un champion nuevo predice mal en producción | ✅ Rollback moviendo el alias `@champion` o desplegando el tag del commit anterior | MLflow Registry, `scripts/deploy_ecs.sh` |
+
+✅ = control implementado y verificado en el laboratorio 14.2.
+
+### Riesgos que esta solución todavía no cubre
+
+| Fase | Riesgo | Por qué no está cubierto | Control propuesto |
+|---|---|---|---|
+| 6. Monitoreo | El monitoreo en producción no tiene datos: `logs/predictions.jsonl` vive dentro del contenedor de ECS y se pierde cada vez que la tarea se reemplaza | `model-monitoring.yml` corre sobre escenarios simulados, no sobre el tráfico real de prod | Enviar el log de predicciones a S3 o CloudWatch Logs y que el monitor lea de ahí, junto con las etiquetas reales cuando lleguen |
+| 5. Despliegue | La API es pública por HTTP, sin autenticación ni límite de peticiones | El ALB escucha en el puerto 80 abierto a internet | HTTPS con certificado de ACM, API key o autenticación, y WAF con rate limiting |
 
 ## Decisiones registradas
 
@@ -45,4 +59,7 @@ los detecta. Esta ficha es el registro de esas decisiones: se versiona junto al 
 | 2026-11-11 | Se agrega `gradient_boosting` como cuarto candidato; el elegido sigue siendo `random_forest` | F1 CV 0.6476 ± 0.0761 y ROC-AUC CV 0.6858, por debajo de random_forest (0.6900 / 0.7326) |
 | 2026-11-11 | Se mantienen los costos FN 200 / FP 100 | Con FN 500 / FP 50 el umbral óptimo es 0.05 (contactar a todos) y el modelo no ahorra frente a esa política |
 | 2026-11-11 | `contract_type` no entra al gate de segmentos; se reporta aparte | Brecha de recall 0.50 (> 0.25) por pocos churners en contratos largos; no es un atributo sensible |
+| 2026-11-13 | Un entorno por rama: `develop` → staging, `main` → producción con aprobación | El modelo se prueba en infraestructura real antes de llegar a clientes |
+| 2026-11-13 | `main` promueve la imagen de staging en lugar de reconstruirla (reto 8) | Producción corre exactamente el artefacto que se probó |
+| 2026-11-13 | El monitor reentrena con 2+ features en PSI crítico, PSI de predicción crítico o caída de F1 ≥ 0.10 | Las señales sin etiquetas avisan antes; el F1 confirma el concept drift |
 | 2026-11-11 | Contrato de datos con check de filas duplicadas completas | Un cliente duplicado con otro id sesga el entrenamiento y no lo detecta `unique_id` |

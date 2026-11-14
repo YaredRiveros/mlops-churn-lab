@@ -118,3 +118,37 @@ Brecha 0.50 > 0.25: **no cumple el gate**. Los contratos largos tienen pocos chu
 ### Reto 4 · Check de duplicados completos
 
 `validate_data.py` agrega `no_full_duplicates` (filas idénticas ignorando `customer_id`) y `tests/test_data_contract.py::test_full_duplicate_rows_fail` lo prueba. El contrato pasa de 23 a 24 checks.
+
+## Resultados del laboratorio 14.2 (retos)
+
+### Reto 1 · Por qué `price_hike` se detecta sin etiquetas y `competitor` no
+
+`python src/monitor.py --scenario <escenario>` (8 semanas, el drift empieza en la semana 5):
+
+**price_hike** (sube la tarifa y se disparan los reclamos)
+
+| ventana | psi_max | pred_psi | f1 | decisión |
+|---|---|---|---|---|
+| week_4 | 0.057 | 0.025 | 0.701 | MONITOREAR |
+| week_5 | 0.584 | 0.066 | 0.716 | ALERTA |
+| week_6 | 0.927 | 0.160 | 0.732 | ALERTA |
+| week_7 | 2.418 | 0.182 | 0.723 | REENTRENAR |
+| week_8 | 2.579 | 0.206 | 0.723 | REENTRENAR |
+
+**competitor** (un competidor capta a los clientes de contrato largo)
+
+| ventana | psi_max | pred_psi | f1 | decisión |
+|---|---|---|---|---|
+| week_4 | 0.057 | 0.025 | 0.701 | MONITOREAR |
+| week_5 | 0.040 | 0.018 | 0.732 | MONITOREAR |
+| week_6 | 0.019 | 0.020 | 0.507 | REENTRENAR |
+| week_7 | 0.041 | 0.016 | 0.493 | REENTRENAR |
+| week_8 | 0.055 | 0.028 | 0.384 | REENTRENAR |
+
+- **`price_hike` es data drift**: cambian las features (`monthly_charges`, `support_tickets_last_6m`), es decir `P(X)`. El PSI se puede calcular con lo que llega a la API, sin saber quién se fue: la alerta sale en la semana 5 y REENTRENAR en la 7, con el F1 intacto. Con tráfico real (`simulate_traffic.py --scenario price_hike` + `monitor.py --from-log`) el PSI llega a 2.71 y la decisión es REENTRENAR sin una sola etiqueta.
+- **`competitor` es concept drift**: los clientes siguen pareciéndose a los de entrenamiento (PSI de 0.02 a 0.05, todo "verde"), pero cambia la relación entre features y churn, `P(y|X)`: los de contrato largo ahora sí se van. Ni el PSI de las features ni el de las predicciones lo ven; solo el F1 contra la etiqueta real, que cae de 0.70 a 0.38.
+- **Tiempo de reacción con etiquetas a 4 semanas**: con etiquetas inmediatas el sistema reacciona en la semana 6 (la primera ventana con F1 0.507). Si las etiquetas de la semana 6 llegan 4 semanas después, la caída se ve recién en la **semana 10**: **5 semanas después de que empezó el drift** (semana 5), 4 más que con etiquetas inmediatas. Durante ese tiempo el modelo sigue sin contactar a los clientes de contrato largo que se están yendo.
+
+### Reto 2 · Ficha CRISP-ML(Q)
+
+`docs/crisp-mlq.md` marca los controles de las fases 5 y 6 implementados y agrega los riesgos que esta solución todavía no cubre.

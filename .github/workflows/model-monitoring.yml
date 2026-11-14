@@ -17,6 +17,7 @@ on:
 permissions:
   contents: read
   actions: write
+  issues: write
 
 jobs:
   monitor:
@@ -78,3 +79,20 @@ jobs:
         run: |
           echo "El monitor pidió reentrenar: se dispara mlops.yml"
           gh workflow run mlops.yml --ref "${{ github.ref_name }}"
+
+      # Reto 4: deja registro del reentrenamiento en un issue
+      - name: Abrir issue de reentrenamiento
+        if: steps.monitor.outputs.exit_code == '42'
+        run: |
+          python - <<'PY' > issue.md
+          import json
+          r = json.load(open("reports/monitoring_report.json"))
+          print(f"El monitor decidió **{r['decision']}** (escenario `${{ inputs.scenario || 'none' }}`).")
+          print()
+          for reason in r["reasons"]:
+              print(f"- {reason}")
+          print()
+          print("Corrida: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          print("Se disparó `mlops.yml` en `${{ github.ref_name }}` (Continuous Training).")
+          PY
+          gh issue create --title "Reentrenar churn-predictor: drift detectado ($(date -u +%F))" --body-file issue.md
