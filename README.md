@@ -152,3 +152,28 @@ Brecha 0.50 > 0.25: **no cumple el gate**. Los contratos largos tienen pocos chu
 ### Reto 2 · Ficha CRISP-ML(Q)
 
 `docs/crisp-mlq.md` marca los controles de las fases 5 y 6 implementados y agrega los riesgos que esta solución todavía no cubre.
+
+### Reto 3 · Alerta de PSI crítico
+
+`monitoring/prometheus/alerts.yml` agrega `ChurnModelPsiCritical` (`model_psi_max > 0.25` durante 1 minuto). Con `monitor.py --scenario price_hike --push localhost:9091` el PSI máximo llega a 2.579 y la alerta pasa a FIRING. Con `competitor` no se dispara (PSI máximo 0.055): solo salta `ChurnModelRetrainNeeded` por la caída del F1.
+
+### Reto 4 · Issue automático al reentrenar
+
+`model-monitoring.yml` tiene `permissions: issues: write` y un paso que, si el monitor devuelve exit 42, abre un issue con la decisión, los motivos y el enlace a la corrida (`gh issue create`).
+
+### Reto 5 · Rollback automático del circuit breaker
+
+`scripts/deploy_ecs.sh staging "$REPOSITORY:no-existe"` registró la revisión 4 con una imagen inexistente. ECS intentó levantar la tarea varias veces (`CannotPullContainerError: ... churn-predictor:no-existe: not found`). Al llegar al umbral de fallos, el **circuit breaker** marcó el despliegue como `FAILED` ("tasks failed to start") y volvió solo a la revisión 3 ("rolling back to deployment ..."). La tarea anterior nunca se apagó, así que staging siguió respondiendo `/health` todo el tiempo.
+
+El script termina con error por diseño: `aws ecs wait services-stable` agotó sus intentos (10 minutos) mientras el rollback seguía en curso (exit 255). Si el waiter hubiera alcanzado el estado estable, la verificación final habría encontrado la revisión 3 en ejecución en lugar de la 4 e impreso `El despliegue falló: ECS hizo rollback`, con exit 1. En los dos casos el job de despliegue falla y el pipeline no reporta un despliegue que no ocurrió.
+
+### Retos 6 y 7 · Estado en S3 e `infra.yml`
+
+No se ejecutaron en este laboratorio. Para el 6 bastaría con crear un bucket S3 versionado y una tabla DynamoDB de locks, descomentar el bloque `backend "s3"` de `infra/main.tf` y correr `terraform init -migrate-state`: los workspaces `staging` y `prod` pasan a `env:/staging/...` y `env:/prod/...` en el bucket. El 7 necesita ese estado remoto y otro usuario IAM con permisos de infraestructura.
+
+### Reto 8 · Promover la misma imagen de staging a producción
+
+En `main`, `build-and-publish` ya no reconstruye. Si el commit es un merge de `develop` (segundo padre `HEAD^2`) y su imagen existe en ECR, lee el manifiesto con `aws ecr batch-get-image` y lo vuelve a publicar con `aws ecr put-image` bajo los tags del commit de `main` y `latest`. Es el **mismo digest**, sin rebuild (el job tarda 12 s en vez de más de 1 minuto). `deploy-production` despliega ese tag y corre el test de skew con el modelo de la corrida de `develop` que construyó la imagen. Si el commit no viene de `develop` o la imagen no existe, el job construye como antes.
+
+- **Qué gana el proyecto:** producción ejecuta exactamente el artefacto que se probó en staging (mismo digest, mismas dependencias, mismo `.pkl`). Desaparece el riesgo de que dos builds del mismo código den imágenes distintas (capas base actualizadas, versiones resueltas en otro momento, un modelo reentrenado con otra semilla). Además el release es más rápido y reproducible.
+- **Qué cambia en el pipeline:** `main` deja de producir imágenes propias y depende de que la corrida de `develop` haya terminado con éxito. El reentrenamiento que dispara el monitor en `main` ya no cambia lo que se despliega: un modelo nuevo tiene que pasar primero por `develop` y staging.
