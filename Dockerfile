@@ -2,22 +2,20 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+COPY requirements-serve.txt .
+RUN pip install --no-cache-dir -r requirements-serve.txt
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# App code
 COPY app/ ./app/
 
-# Model artifacts produced by the CI/CD pipeline
-COPY data/production_model.pkl     ./data/production_model.pkl
+# Artefactos que produce el job evaluate del pipeline
+COPY data/production_model.pkl       ./data/production_model.pkl
 COPY data/production_model_info.json ./data/production_model_info.json
-COPY data/scaler.pkl               ./data/scaler.pkl
-COPY data/feature_names.csv        ./data/feature_names.csv
 
+# El proceso no corre como root
+RUN useradd --create-home appuser && mkdir -p /app/logs && chown -R appuser /app
+USER appuser
+
+ENV PREDICTION_LOG=/app/logs/predictions.jsonl
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

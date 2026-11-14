@@ -1,7 +1,7 @@
 """
 Fixtures compartidas para todos los tests.
-Mocks todos los artefactos ML antes de importar app/main.py,
-así los tests corren sin necesitar archivos entrenados.
+La API se importa con el modelo mockeado, así los tests unitarios corren
+sin necesitar artefactos entrenados.
 """
 import builtins
 import io
@@ -10,26 +10,28 @@ import os
 import sys
 
 import numpy as np
-import pandas as pd
 import pytest
 from unittest.mock import MagicMock, patch
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+ROOT = os.path.join(os.path.dirname(__file__), "..")
+sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.join(ROOT, "src"))
 
 # ── Datos de prueba ───────────────────────────────────────────────────────────
 
 MOCK_FEATURES = [
-    "gender", "SeniorCitizen", "tenure", "MonthlyCharges", "support_tickets",
-    "Contract_One Year", "Contract_Two Year",
-    "InternetService_Fiber", "InternetService_No",
+    "tenure_months", "monthly_charges", "support_tickets_last_6m",
+    "gender", "contract_type", "internet_service", "senior_citizen",
 ]
 
 MOCK_MODEL_INFO = {
     "model_name": "churn-predictor",
     "version": "2",
-    "stage": "Production",
-    "model_type": "LogisticRegression",
-    "metrics": {"accuracy": 0.733, "f1": 0.692, "roc_auc": 0.828},
+    "alias": "champion",
+    "model_type": "random_forest",
+    "threshold": 0.3,
+    "features": MOCK_FEATURES,
+    "metrics": {"f1": 0.70, "roc_auc": 0.80},
 }
 
 SAMPLE_CUSTOMER = {
@@ -46,16 +48,10 @@ SAMPLE_CUSTOMER = {
 # ── Fixture principal ─────────────────────────────────────────────────────────
 
 @pytest.fixture(scope="session")
-def client():
-    """TestClient con todos los artefactos ML mockeados (sin archivos reales)."""
+def client(tmp_path_factory):
+    """TestClient con el Pipeline mockeado (probabilidad fija 0.85)."""
     _model = MagicMock()
-    _model.predict.return_value = np.array([1])
-    _model.predict_proba.return_value = np.array([[0.15, 0.85]])
-
-    _scaler = MagicMock()
-    _scaler.transform.side_effect = lambda x: x.values
-
-    _features_df = pd.DataFrame(MOCK_FEATURES, columns=[0])
+    _model.predict_proba.side_effect = lambda X: np.tile([0.15, 0.85], (len(X), 1))
 
     _orig_open = builtins.open
 
@@ -64,8 +60,9 @@ def client():
             return io.StringIO(json.dumps(MOCK_MODEL_INFO))
         return _orig_open(path, *args, **kwargs)
 
-    with patch("joblib.load", side_effect=lambda p: _model if "model" in str(p) else _scaler), \
-         patch("pandas.read_csv", return_value=_features_df), \
+    os.environ["PREDICTION_LOG"] = str(tmp_path_factory.mktemp("logs") / "predictions.jsonl")
+
+    with patch("joblib.load", return_value=_model), \
          patch("builtins.open", side_effect=_selective_open):
 
         sys.modules.pop("app.main", None)
@@ -73,5 +70,4 @@ def client():
         import app.main as app_module
         from fastapi.testclient import TestClient
 
-    # Los mocks solo hacen falta mientras se importa la API
     yield TestClient(app_module.app)
